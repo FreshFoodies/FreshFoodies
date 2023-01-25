@@ -1,12 +1,28 @@
+import json
 from flask import Flask, jsonify, request, url_for
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
-from user import get_current_user
+# from user import get_current_user
+
+# NOTE: just a testing version of this function, should be imported from user.py
+def get_current_user():
+    return {
+    'username': 'arjunsrivastava',   
+    'first_name': 'Arjun',
+    'last_name': 'Srivastava',
+    'email': 'arj1@uw.edu',
+    'current_fridge_items': 4
+    }
 
 app = Flask(__name__)
 
+# Set up token keys
+app.config["JWT_SECRET_KEY"] = "please-remember-to-change-me"
+jwt = JWTManager(app)
+
 # Local accounts before we implement database
 test_accounts = {'arjunsrivastava': {
+    'username': 'arjunsrivastava',
     'first_name': 'Arjun',
     'last_name': 'Srivastava',
     'email': 'arj1@uw.edu',
@@ -48,11 +64,4 @@ def login(username):
 @app.route("/me")
 def me_api():
     user = get_current_user()
-    return {
-        "username": user.username,
-        "image": url_for("user_image", filename=user.image),
-        'first_name': 'Arjun',
-        'last_name': 'Srivastava',
-        'email': 'arj1@uw.edu',
-        'current_fridge_items': 4
-    }
+    return user
