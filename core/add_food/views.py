@@ -23,7 +23,7 @@ def foods():
                 todo = Food.query.filter_by(id=int(deleteFood)).one()
                 db.session.delete(todo)
                 db.session.commit()
-                return redirect(url_for('food.foods'))
+                return redirect(url_for('food.add-food'))
             else:
                 check = 'Please check-box of task to be deleted'
 
