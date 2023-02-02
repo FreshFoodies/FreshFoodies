@@ -9,7 +9,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 # blueprint for non-authentication parts of the app
-from .add_food import food as food_blueprint
+from .food import food as food_blueprint
 app.register_blueprint(food_blueprint)
-from . import views
-from core import views, models
+from core import views, models  

@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+    <head>
+
+      {% if title %}
+      <title>{{ title }} </title>
+      {% else %}
+      <title>Fridge Items</title>
+      {% endif %}
+    </head>
+    <body>
+
+        {% block content %} {% endblock content%}
+
+    </body>
+</html>

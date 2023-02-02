@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="food_content categories" >    
+    <div class="">
+        <div class="content">
+            <div class="welcome">
+                <button id="openbutton" class="openbtn" >&#9776;</button>
+                <span class="welcome-text">Manage Your Fridge</span> 
+            </div>
+
+            <form action="" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="inputContainer Food">
+                    {{ form.title.label }}<br>
+                    {{ form.title(size=20) }}
+                    {% for error in form.title.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="inputContainer choice ">
+                    {{ form.category.label}}<br>
+                    {{ form.category}}
+                    {% for error in form.category.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="inputContainer  date ">
+                    {{ form.date.label }}<br>
+                    {{ form.date }}
+                    {% for error in form.date.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="inputContainer  time">
+                    {{ form.time.label }}<br>
+                    {{ form.time }}
+                    {% for error in form.time.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="buttons">   
+                    {{ form.submit(class="foodAdd btn") }}
+                </div> 
+            </form>
+            <!-- Food Delete Error alert -->
+            {% if check %}
+                <div class="alert alert-warning" role="alert">
+                    <span class="closebtns" onclick="this.parentElement.style.display='none';">&times;</span>
+                    {{check}}
+                </div>
+            {% endif %}
+            <!-- End Food Delete error alert -->
+
+            <form action="" method="post">
+              {{ form.hidden_tag() }} <!-- csrf token for security -->
+
+              <div class="tabs effect-1">
+                 <!-- tab-content -->
+                <div class="tab-content">
+                  <section id="tab-item-1">
+                      <ul class="foodList">        
+                          {% for food in food %} 
+                          <li class="currentFoodItem">
+                              <input type="checkbox" class="foodCheckbox" name="checkedbox" id="{{ food.id }}" value="{{ food.id }}" >
+                              <label for="{{ food.id }}"><span class="complete-">{{ food.title }}</span></label>
+                              <span class="foodDone" >at</span>
+                              <strong class="foodDone"><i class="fa fa-clock-o"></i> {{ food.time }}</strong>
+                              <span class="foodDone" >on</span>
+                              <strong class="foodDate foodDone"><i class="fa fa-calendar"></i> {{ food.date }}</strong>
+                              <span class="categorypage-{{ food.category }}">{{ food.category }}</span>
+                              <button class="foodDelete " name="foodDelete" formnovalidate="" type="submit" ><i class="fa fa-trash-o icon"></i></button>
+                          </li>     
+                          {% endfor %}
+                      </ul> <!--end All-Foods-List -->
+                  </section>
+                </div><!-- end tab content -->
+              </div><!-- end tab effect -->
+            </form>
+        </div><!-- end content -->
+
+    </div><!-- container -->
+</div>
+{% endblock %}

@@ -7,8 +7,8 @@ class FoodForm(FlaskForm):
     category = SelectField('Category', coerce=int , validators=[DataRequired()])
     date = DateField('Date', format='%Y-%m-%d' , validators=[DataRequired()])
     time = TimeField('Time', format='%H:%M' , validators=[DataRequired()])
-    price = DecimalField('Price', coerce=int, validators=[DataRequired()])
-    submit = SubmitField('Add task')
+    price = DecimalField('Price', validators=[DataRequired()])
+    submit = SubmitField('Add Food')
 
 """
 class DollarField(DecimalField):

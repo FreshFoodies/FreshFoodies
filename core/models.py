@@ -1,4 +1,5 @@
 from core import db
+from core.food.models import Category
 
 class Food(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -10,3 +11,9 @@ class Food(db.Model):
 
     def __repr__(self):
         return '<ToDo {}>'.format(self.title)
+
+# ctgry1 = Category(name='Fruits')
+# ctgry2 = Category(name='Grains')
+# ctgry3 = Category(name='Vegetables')
+# ctgry4 = Category(name='Protein')
+# ctgry5 = Category(name='Dairy')
