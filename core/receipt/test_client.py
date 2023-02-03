@@ -19,10 +19,10 @@ img = cv2.imread('rc.jpg')
 _, img_encoded = cv2.imencode('.jpg', img)
 
 # send http request with image and receive response
-response = requests.post(test_url, data=img_encoded.tobytes(), headers=headers).json()
+response = requests.post(test_url, data=base64.b64encode(img_encoded), headers=headers).json()
 # decode response
 
-encoded_img = response['img'][1:]
+encoded_img = response['img_color'][1:]
 
 print(encoded_img[:20])
 
@@ -30,5 +30,7 @@ decoded = base64.b64decode(encoded_img)
 
 with open('test.jpg', 'wb') as f_output:
     f_output.write(decoded)
+
+print(response['text'])
 
 # expected output: {u'message': u'image received. size=124x124'}
