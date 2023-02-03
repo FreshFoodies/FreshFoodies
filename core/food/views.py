@@ -30,7 +30,7 @@ def foods():
     elif form.validate_on_submit():
         selected= form.category.data
         category= Category.query.get(selected)
-        foods = Food(title=form.title.data, date=form.date.data, time= form.time.data, category= category.name)
+        foods = Food(title=form.title.data, date=form.expiration_date.data, time=form.time.data, category=category.name)
         db.session.add(foods)
         db.session.commit()
         return redirect(url_for('food.foods'))

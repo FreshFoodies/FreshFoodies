@@ -27,9 +27,9 @@
                     {% endfor %}
                 </div>
                 <div class="inputContainer  date ">
-                    {{ form.date.label }}<br>
-                    {{ form.date }}
-                    {% for error in form.date.errors %}
+                    {{ form.expiration_date.label }}<br>
+                    {{ form.expiration_date }}
+                    {% for error in form.expiration_date.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
                 </div>
@@ -68,7 +68,7 @@
                               <span class="foodDone" >at</span>
                               <strong class="foodDone"><i class="fa fa-clock-o"></i> {{ food.time }}</strong>
                               <span class="foodDone" >on</span>
-                              <strong class="foodDate foodDone"><i class="fa fa-calendar"></i> {{ food.date }}</strong>
+                              <strong class="foodDate foodDone"><i class="fa fa-calendar"></i> {{ food.expiration_date }}</strong>
                               <span class="categorypage-{{ food.category }}">{{ food.category }}</span>
                               <button class="foodDelete " name="foodDelete" formnovalidate="" type="submit" ><i class="fa fa-trash-o icon"></i></button>
                           </li>     
