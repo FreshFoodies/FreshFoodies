@@ -2,7 +2,6 @@ from flask import Flask
 from config import Configuration
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from core.food.models import Category
 
 app = Flask(__name__)
 app.config.from_object(Configuration)
