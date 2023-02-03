@@ -1,7 +1,6 @@
 from flask import Flask
 from config import Configuration
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+# from pymongo.collection import Collection
 
 app = Flask(__name__)
 app.config.from_object(Configuration)
