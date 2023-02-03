@@ -5,8 +5,6 @@ from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config.from_object(Configuration)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
 # blueprint for non-authentication parts of the app
 from .food import food as food_blueprint
