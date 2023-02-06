@@ -27,7 +27,7 @@ app.register_blueprint(receipt_blueprint)
 
 
 # Get a reference to the foods collection
-foods: Collection = []
+foods: Collection = pymongo.db
 
 
 @app.errorhandler(404)
