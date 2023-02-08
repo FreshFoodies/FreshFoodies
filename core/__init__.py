@@ -26,9 +26,8 @@ from .receipt import receipt as receipt_blueprint
 app.register_blueprint(receipt_blueprint)
 
 
-# Get a reference to the foods collection
-foods: Collection = pymongo.db
-
+# Get a reference to the fridge collection
+fridge: Collection = pymongo.db.fridge
 
 @app.errorhandler(404)
 def resource_not_found(e):
