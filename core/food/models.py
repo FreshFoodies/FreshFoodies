@@ -19,6 +19,7 @@ class Food(BaseModel):
     date_added: Optional[datetime]
     expiration_date: Optional[datetime]
     price: Optional[float]
+    category: str
 
     # def to_json(self):
     #     return jsonable_encoder(self, exclude_none=True)
@@ -28,11 +29,3 @@ class Food(BaseModel):
     #     if data.get("_id") is None:
     #         data.pop("_id", None)
     #     return data
-
-class Category(BaseModel):
-    id: Optional[PydanticObjectId] = Field(None, alias="_id")
-    slug: str
-    name: str
-
-    def __repr__(self):
-        return '<Category {}>'.format(self.name)

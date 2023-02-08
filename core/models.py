@@ -8,6 +8,7 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union
 from datetime import datetime
+from .food import Food
 
 from .objectid import PydanticObjectId
 
@@ -15,7 +16,7 @@ class User(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
     name: str
     email: str
-    fridge: PydanticObjectId
+    fridge_id: PydanticObjectId
 
     # def to_json(self):
     #     return jsonable_encoder(self, exclude_none=True)
@@ -31,6 +32,7 @@ class Fridge(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
     slug: str
     owners: List[User]
+    foods: List[Food]
 
     # def to_json(self):
     #     return jsonable_encoder(self, exclude_none=True)
