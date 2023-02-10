@@ -7,6 +7,7 @@ from pymongo.collection import Collection, ReturnDocument
 
 import flask
 from flask import Flask, request, url_for, jsonify, render_template
+from flask_login import LoginManager
 from flask_pymongo import PyMongo
 from pymongo.errors import DuplicateKeyError
 
@@ -30,6 +31,7 @@ app.register_blueprint(receipt_blueprint)
 Test Account and Fridge
 """
 USER_ID = PydanticObjectId('63e374f9f538bd23252a2fd1')
+FRIDGE_ID = PydanticObjectId('63e37436f538bd23252a2fcf')
 
 # Get a reference to the fridge collection
 fridges: Collection = pymongo.db.fridges
@@ -97,7 +99,7 @@ def index():
 #         "_links": links,
 #     }
 def list_fridge():
-    fridge = fridges.find_one(PydanticObjectId('63e37436f538bd23252a2fcf'))
+    fridge = fridges.find_one(FRIDGE_ID)
     print(fridge)
     return "success"
 
@@ -144,3 +146,5 @@ def delete_food(slug):
         return food(**deleted_food).to_json()
     else:
         flask.abort(404, "food not found")
+
+# NOTE: Move user stuff to its own blueprint

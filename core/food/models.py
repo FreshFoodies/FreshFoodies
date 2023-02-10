@@ -14,12 +14,12 @@ from core.objectid import PydanticObjectId
 
 class Food(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
-    slug: str
     name: str
     date_added: Optional[datetime]
     expiration_date: Optional[datetime]
     price: Optional[float]
     category: str
+    quantity: int
 
     # def to_json(self):
     #     return jsonable_encoder(self, exclude_none=True)
