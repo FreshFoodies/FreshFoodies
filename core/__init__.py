@@ -55,8 +55,14 @@ def index():
     greeting="Welcome to LookingGlass!"
     return render_template('index.html', greet=greeting)
 
+# TODO: Create new empty fridge
+@app.route("/fridge/new", methods=["POST"])
+def new_fridge(id):
+    return "success"
+
+# Retrieve fridge from given ID
 @app.route("/fridge/<string:id>")
-def list_fridge(id):
+def get_fridge(id):
     id_object: PydanticObjectId = PydanticObjectId(id)
     fridge = fridges.find_one(id_object)
     print(fridge)
