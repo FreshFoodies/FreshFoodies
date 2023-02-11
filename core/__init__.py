@@ -11,7 +11,6 @@ from flask_login import LoginManager
 from flask_pymongo import PyMongo
 from pymongo.errors import DuplicateKeyError
 
-from .models import Fridge, User, Food
 from .objectid import PydanticObjectId
 
 # Set up flask app
@@ -53,53 +52,13 @@ def resource_not_found(e):
 
 @app.route("/")
 def index():
-    greeting="Hello there"
+    greeting="Welcome to LookingGlass!"
     return render_template('index.html', greet=greeting)
 
-@app.route("/fridge/")
-# def list_foods():
-#     """
-#     GET a list of current foods in user's fridge
-#     The results are paginated using the `page` parameter.
-#     """
-
-#     page = int(request.args.get("page", 1))
-#     per_page = 10  # A const value.
-
-
-
-#     # For pagination, it's necessary to sort by name,
-#     # then skip the number of docs that earlier pages would have displayed,
-#     # and then to limit to the fixed page size, ``per_page``.
-#     cursor = fridges.find().sort("slug").skip(per_page * (page - 1)).limit(per_page)
-
-#     food_count = fridges.count_documents({})
-
-#     links = {
-#         "self": {"href": url_for(".list_foods", page=page, _external=True)},
-#         "last": {
-#             "href": url_for(
-#                 ".list_foods", page=(food_count // per_page) + 1, _external=True
-#             )
-#         },
-#     }
-#     # Add a 'prev' link if it's not on the first page:
-#     if page > 1:
-#         links["prev"] = {
-#             "href": url_for(".list_foods", page=page - 1, _external=True)
-#         }
-#     # Add a 'next' link if it's not on the last page:
-#     if page - 1 < food_count // per_page:
-#         links["next"] = {
-#             "href": url_for(".list_foods", page=page + 1, _external=True)
-#         }
-
-#     return {
-#         "fridges": [food(**doc).to_json() for doc in cursor],
-#         "_links": links,
-#     }
-def list_fridge():
-    fridge = fridges.find_one(FRIDGE_ID)
+@app.route("/fridge/<string:id>")
+def list_fridge(id):
+    id_object: PydanticObjectId = PydanticObjectId(id)
+    fridge = fridges.find_one(id_object)
     print(fridge)
     return "success"
 
