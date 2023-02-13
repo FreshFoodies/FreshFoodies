@@ -25,6 +25,8 @@ app.register_blueprint(food_blueprint)
 from .receipt import receipt as receipt_blueprint
 app.register_blueprint(receipt_blueprint)
 
+from .models import Fridge
+
 
 """
 Test Account and Fridge
@@ -34,6 +36,7 @@ FRIDGE_ID = PydanticObjectId('63e37436f538bd23252a2fcf')
 
 # Get a reference to the fridge collection
 fridges: Collection = pymongo.db.fridges
+users: Collection = pymongo.db.users
 
 @app.errorhandler(404)
 def resource_not_found(e):
@@ -52,21 +55,31 @@ def resource_not_found(e):
 
 @app.route("/")
 def index():
-    greeting="Welcome to LookingGlass!"
+    greeting="Welcome to the LookingGlass API!"
     return render_template('index.html', greet=greeting)
 
 # TODO: Create new empty fridge
 @app.route("/fridge/new", methods=["POST"])
 def new_fridge(id):
-    return "success"
+    return {
+        "status": "success"
+    }
 
 # Retrieve fridge from given ID
+"""
+Success: Returns JSON representation of Fridge
+Failure: 404
+"""
 @app.route("/fridge/<string:id>")
 def get_fridge(id):
     id_object: PydanticObjectId = PydanticObjectId(id)
-    fridge = fridges.find_one(id_object)
-    print(fridge)
-    return "success"
+    raw_fridge = fridges.find_one_or_404(id_object)
+    fridge: Fridge = Fridge(**raw_fridge)
+    return fridge.to_json()
+
+@app.route("/fridge/<string:id>/add")
+def add_to_fridge(id):
+    return id
 
 @app.route("/foods/", methods=["POST"])
 def new_food():

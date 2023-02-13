@@ -1,6 +1,6 @@
 # FastAPI's jsonable_encoder handles converting various non-JSON types,
 # such as datetime between JSON types and native Python types.
-# from fastapi.encoders import jsonable_encoder
+from fastapi.encoders import jsonable_encoder
 
 # Pydantic, and Python's built-in typing are used to define a schema
 # that defines the structure and types of the different objects stored
@@ -18,8 +18,8 @@ class User(BaseModel):
     email: str
     fridge_id: PydanticObjectId
 
-    # def to_json(self):
-    #     return jsonable_encoder(self, exclude_none=True)
+    def to_json(self):
+        return jsonable_encoder(self, exclude_none=True)
 
     # def to_bson(self):
     #     data = self.dict(by_alias=True, exclude_none=True)
@@ -31,17 +31,14 @@ class User(BaseModel):
 class Fridge(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
     slug: str
-    owners: List[User]
+    users: List[str]    # NOTE: CHANGE TO LIST OF USERS INSTEAD OF STRS
     foods: List[Food]
 
-    # def to_json(self):
-    #     return jsonable_encoder(self, exclude_none=True)
+    def to_json(self):
+        return jsonable_encoder(self, exclude_none=True)
 
-    # def to_bson(self):
-    #     data = self.dict(by_alias=True, exclude_none=True)
-    #     if data.get("_id") is None:
-    #         data.pop("_id", None)
-    #     return data
-
-    def __repr__(self):
-        pass
+    def to_bson(self):
+        data = self.dict(by_alias=True, exclude_none=True)
+        if data.get("_id") is None:
+            data.pop("_id", None)
+        return data
