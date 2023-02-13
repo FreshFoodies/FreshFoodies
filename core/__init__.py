@@ -58,12 +58,16 @@ def index():
     greeting="Welcome to the LookingGlass API!"
     return render_template('index.html', greet=greeting)
 
-# TODO: Create new empty fridge
+# Create new empty fridge
 @app.route("/fridge/new", methods=["POST"])
 def new_fridge(id):
-    return {
-        "status": "success"
-    }
+    raw_fridge = request.get_json()
+    raw_fridge["date_added"] = datetime.utcnow()
+
+    fridge: Fridge = Fridge(**raw_fridge)
+    insert_result = fridges.insert_one(fridge.to_bson())
+    fridge.id = PydanticObjectId(str(insert_result.inserted_id))
+    return fridge.to_json()
 
 # Retrieve fridge from given ID
 """
@@ -72,32 +76,54 @@ Failure: 404
 """
 @app.route("/fridge/<string:id>")
 def get_fridge(id):
+    if len(id) != 24:
+        flask.abort(404, "fridge not found")
     id_object: PydanticObjectId = PydanticObjectId(id)
     raw_fridge = fridges.find_one_or_404(id_object)
     fridge: Fridge = Fridge(**raw_fridge)
     return fridge.to_json()
 
-@app.route("/fridge/<string:id>/add")
+# TODO: Update users of fridge
+"""
+Success: Returns JSON representation of Fridge
+Failure: 404
+"""
+@app.route("/fridge/<string:id>/users")
+def update_fridge_users(id):
+    pass
+
+
+# TODO: Add or remove list of foods to fridge
+"""
+Expects a list of food objects and:
+"action": "add"/"remove"
+
+slug field should be set to the food name with dashes in between
+"""
+@app.route("/fridge/<string:id>/foods/", methods=["PUT"])
 def add_to_fridge(id):
-    return id
-
-@app.route("/foods/", methods=["POST"])
-def new_food():
-    raw_food = request.get_json()
-    raw_food["date_added"] = datetime.utcnow()
-
-    food = food(**raw_food)
-    insert_result = fridges.insert_one(food.to_bson())
-    food.id = PydanticObjectId(str(insert_result.inserted_id))
-    print(food)
-
-    return food.to_json()
+    raw_food_list = request.get_json()
+    count = None  # Store count to update fridge
 
 
-@app.route("/foods/<string:slug>", methods=["GET"])
-def get_food(slug):
+# Get/modify information about a specifc food iun the fridge
+@app.route("/fridge/<string:id>/foods/<string:slug>", methods=["GET", "PUT"])
+def get_food(id, slug):
     recipe = fridges.find_one_or_404({"slug": slug})
     return food(**recipe).to_json()
+
+
+# Delete entire fridge
+
+@app.route("/fridge/<string:id>", methods=["REMOVE"])
+def delete_food(id):
+    deleted_fridge = fridges.find_one_and_delete(
+        {"_id": id},
+    )
+    if deleted_fridge:
+        return Fridge(**deleted_fridge).to_json()
+    else:
+        flask.abort(404, "fridge not found")
 
 
 @app.route("/foods/<string:slug>", methods=["PUT"])
@@ -114,15 +140,3 @@ def update_food(slug):
     else:
         flask.abort(404, "food not found")
 
-
-@app.route("/foods/<string:slug>", methods=["DELETE"])
-def delete_food(slug):
-    deleted_food = fridges.find_one_and_delete(
-        {"slug": slug},
-    )
-    if deleted_food:
-        return food(**deleted_food).to_json()
-    else:
-        flask.abort(404, "food not found")
-
-# NOTE: Move user stuff to its own blueprint
