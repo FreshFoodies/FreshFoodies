@@ -85,8 +85,7 @@ def get_fridge(id):
 
 # TODO: Update users of fridge
 """
-Success: Returns JSON representation of Fridge
-Failure: 404
+
 """
 @app.route("/fridge/<string:id>/users")
 def update_fridge_users(id):
@@ -95,7 +94,7 @@ def update_fridge_users(id):
 
 # TODO: Add or remove list of foods to fridge
 """
-Expects a list of food objects and:
+Expects a list of food names and:
 "action": "add"/"remove"
 
 slug field should be set to the food name with dashes in between
@@ -106,7 +105,7 @@ def add_to_fridge(id):
     count = None  # Store count to update fridge
 
 
-# Get/modify information about a specifc food iun the fridge
+# Get/modify information about a specifc food in the fridge
 @app.route("/fridge/<string:id>/foods/<string:slug>", methods=["GET", "PUT"])
 def get_food(id, slug):
     recipe = fridges.find_one_or_404({"slug": slug})
