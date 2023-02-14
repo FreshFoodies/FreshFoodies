@@ -59,7 +59,10 @@ def index():
     return render_template('index.html', greet=greeting)
 
 # Create new empty fridge
-@app.route("/fridge/new", methods=["POST"])
+"""
+
+"""
+@app.route("/api/fridge/new", methods=["POST"])
 def new_fridge(id):
     raw_fridge = request.get_json()
     raw_fridge["date_added"] = datetime.utcnow()
@@ -74,7 +77,7 @@ def new_fridge(id):
 Success: Returns JSON representation of Fridge
 Failure: 404
 """
-@app.route("/fridge/<string:id>")
+@app.route("/api/fridge/<string:id>")
 def get_fridge(id):
     if len(id) != 24:
         flask.abort(404, "fridge not found")
@@ -87,7 +90,7 @@ def get_fridge(id):
 """
 
 """
-@app.route("/fridge/<string:id>/users")
+@app.route("/api/fridge/<string:id>/users")
 def update_fridge_users(id):
     pass
 
@@ -99,21 +102,21 @@ Expects a list of food names and:
 
 slug field should be set to the food name with dashes in between
 """
-@app.route("/fridge/<string:id>/foods/", methods=["PUT"])
+@app.route("/api/fridge/<string:id>/foods/", methods=["PUT"])
 def add_to_fridge(id):
     raw_food_list = request.get_json()
     count = None  # Store count to update fridge
 
 
 # Get/modify information about a specifc food in the fridge
-@app.route("/fridge/<string:id>/foods/<string:slug>", methods=["GET", "PUT"])
+@app.route("/api/fridge/<string:id>/foods/<string:slug>", methods=["GET", "PUT"])
 def get_food(id, slug):
     recipe = fridges.find_one_or_404({"slug": slug})
     return food(**recipe).to_json()
 
 
 # Delete entire fridge
-@app.route("/fridge/<string:id>", methods=["DELETE"])
+@app.route("/api/fridge/<string:id>", methods=["DELETE"])
 def delete_food(id):
     id_object: PydanticObjectId = PydanticObjectId(id)
     deleted_fridge = fridges.find_one_and_delete(
@@ -125,7 +128,7 @@ def delete_food(id):
         flask.abort(404, "fridge not found")
 
 
-@app.route("/foods/<string:slug>", methods=["PUT"])
+@app.route("/api/foods/<string:slug>", methods=["PUT"])
 def update_food(slug):
     food = food(**request.get_json())
     food.date_updated = datetime.utcnow()
