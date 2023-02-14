@@ -2,7 +2,6 @@ from flask import Flask
 from config import Configuration
 from datetime import datetime
 import os
-
 from pymongo.collection import Collection, ReturnDocument
 
 import flask
@@ -25,7 +24,7 @@ app.register_blueprint(food_blueprint)
 from .receipt import receipt as receipt_blueprint
 app.register_blueprint(receipt_blueprint)
 
-from .models import Fridge
+from .models import Fridge, Food
 
 
 """
@@ -60,14 +59,29 @@ def index():
 
 # Create new empty fridge
 """
+POST
+EXPECTS:
+{
+    "email": "email",
+    "slug": "name"
+}
 
+RETURNS:
+{
+    "_id":"",
+    "foods":[],
+    "slug":"",
+    "users":[]
+}
 """
-@app.route("/api/fridge/new", methods=["POST"])
-def new_fridge(id):
+@app.route("/api/fridge", methods=["POST"])
+def new_fridge():
     raw_fridge = request.get_json()
-    raw_fridge["date_added"] = datetime.utcnow()
-
+    # raw_fridge["date_added"] = datetime.utcnow()
     fridge: Fridge = Fridge(**raw_fridge)
+    fridge.foods = []
+    fridge.slug = raw_fridge["slug"]
+    fridge.users = [raw_fridge["email"]]
     insert_result = fridges.insert_one(fridge.to_bson())
     fridge.id = PydanticObjectId(str(insert_result.inserted_id))
     return fridge.to_json()
@@ -77,7 +91,7 @@ def new_fridge(id):
 Success: Returns JSON representation of Fridge
 Failure: 404
 """
-@app.route("/api/fridge/<string:id>")
+@app.route("/api/fridge/<string:id>", methods=["GET"])
 def get_fridge(id):
     if len(id) != 24:
         flask.abort(404, "fridge not found")

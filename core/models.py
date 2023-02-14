@@ -31,8 +31,8 @@ class User(BaseModel):
 class Fridge(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
     slug: str
-    users: List[str]    # NOTE: CHANGE TO LIST OF USERS INSTEAD OF STRS
-    foods: List[Food]
+    users: Optional[List[str]]    # TODO: CHANGE TO LIST OF USERS INSTEAD OF STRS
+    foods: Optional[List[Food]]
 
     def to_json(self):
         return jsonable_encoder(self, exclude_none=True)
