@@ -114,11 +114,11 @@ def get_food(id, slug):
 
 
 # Delete entire fridge
-
-@app.route("/fridge/<string:id>", methods=["REMOVE"])
+@app.route("/fridge/<string:id>", methods=["DELETE"])
 def delete_food(id):
+    id_object: PydanticObjectId = PydanticObjectId(id)
     deleted_fridge = fridges.find_one_and_delete(
-        {"_id": id},
+        {"_id": id_object},
     )
     if deleted_fridge:
         return Fridge(**deleted_fridge).to_json()
