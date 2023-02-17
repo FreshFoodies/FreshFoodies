@@ -95,7 +95,8 @@ def receipts():
     print("encoded back into base64")
 
     # build a response dict to send back to client
-    response = {'status': 200, 'img_color': img_b64_color, 'img_bw': img_b64_bw, 'text': cleaned}
+    # response = {'status': 200, 'img_color': img_b64_color, 'img_bw': img_b64_bw, 'text': cleaned}
+    response = {'status': 200, 'text': cleaned}
 
     print("done!")
 
