@@ -96,16 +96,14 @@ Failure: 404
 def get_fridge(id):
     if len(id) != 24:
         flask.abort(404, "fridge not found")
-    id_object: PydanticObjectId = PydanticObjectId(id)
-    raw_fridge = fridges.find_one_or_404(id_object)
-    fridge: Fridge = Fridge(**raw_fridge)
+    fridge = get_fridge_mongodb(id)
     return fridge.to_json()
 
 # TODO: Update users of fridge
 """
 
 """
-@app.route("/api/fridge/<string:id>/users")
+@app.route("/api/fridge/<string:id>/users", methods=["PUT"])
 def update_fridge_users(id):
     pass
 
@@ -124,8 +122,15 @@ slug field should be set to the food name with dashes in between
 def add_to_fridge(id):
     request_json = request.get_json()
     action = request_json["action"]
-    foods = request_json["foods"]
-    print(foods)
+    foods_raw = request_json["foods"]
+    foods = json.loads(foods_raw)   # Parse food objects
+    filter = {'_id': PydanticObjectId(id)}  # Filter for finding fridge in database
+    if action == 'add':
+        pass
+    elif action == 'remove':
+        pass
+    else:
+        flask.abort(400, "Invalid action")
     
     count = None  # Store count to update fridge
     return {
@@ -149,9 +154,9 @@ def delete_food(id):
     if deleted_fridge:
         return Fridge(**deleted_fridge).to_json()
     else:
-        flask.abort(404, "fridge not found")
+        flask.abort(404, "Fridge not found")
 
-
+# TODO: Delete
 @app.route("/api/foods/<string:slug>", methods=["PUT"])
 def update_food(slug):
     food = food(**request.get_json())
@@ -164,5 +169,11 @@ def update_food(slug):
     if updated_doc:
         return food(**updated_doc).to_json()
     else:
-        flask.abort(404, "food not found")
+        flask.abort(404, "Food not found")
 
+# Retrieve fridge object
+def get_fridge_mongodb(id) -> Fridge:
+    id_object: PydanticObjectId = PydanticObjectId(id)
+    raw_fridge = fridges.find_one_or_404(id_object)
+    fridge: Fridge = Fridge(**raw_fridge)
+    return fridge

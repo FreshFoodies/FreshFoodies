@@ -21,6 +21,7 @@ class Food(BaseModel):
     price: Optional[float]
     category: str
     quantity: int
+    location: Optional[str]
 
     def to_json(self):
         return jsonable_encoder(self, exclude_none=True)
