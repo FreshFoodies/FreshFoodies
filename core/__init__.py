@@ -2,6 +2,7 @@ from flask import Flask
 from config import Configuration
 from datetime import datetime
 import os
+import json
 from pymongo.collection import Collection, ReturnDocument
 
 import flask
@@ -69,9 +70,9 @@ EXPECTS:
 RETURNS:
 {
     "_id":"",
-    "foods":[],
+    "foods":[...],
     "slug":"",
-    "users":[]
+    "users":[...]
 }
 """
 @app.route("/api/fridge", methods=["POST"])
@@ -111,16 +112,25 @@ def update_fridge_users(id):
 
 # TODO: Add or remove list of foods to fridge
 """
-Expects a list of food names and:
-"action": "add"/"remove"
+EXPECTS
+{
+    "foods": []
+    "action": "add"/"remove"
+}
 
 slug field should be set to the food name with dashes in between
 """
-@app.route("/api/fridge/<string:id>/foods/", methods=["PUT"])
+@app.route("/api/fridge/<string:id>/foods", methods=["PUT"])
 def add_to_fridge(id):
-    raw_food_list = request.get_json()
+    request_json = request.get_json()
+    action = request_json["action"]
+    foods = request_json["foods"]
+    print(foods)
+    
     count = None  # Store count to update fridge
-
+    return {
+        "status": "success"
+    }
 
 # Get/modify information about a specifc food in the fridge
 @app.route("/api/fridge/<string:id>/foods/<string:slug>", methods=["GET", "PUT"])
