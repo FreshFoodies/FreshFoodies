@@ -16,6 +16,7 @@ from .objectid import PydanticObjectId
 # Set up flask app
 app = Flask(__name__)
 app.config.from_object(Configuration)
+app.url_map.strict_slashes = False
 pymongo = PyMongo(app)
 
 # blueprint for non-authentication parts of the app
@@ -125,6 +126,7 @@ def add_to_fridge(id):
     foods_raw = request_json["foods"]
     foods = json.loads(foods_raw)   # Parse food objects
     filter = {'_id': PydanticObjectId(id)}  # Filter for finding fridge in database
+
     if action == 'add':
         pass
     elif action == 'remove':
@@ -132,16 +134,21 @@ def add_to_fridge(id):
     else:
         flask.abort(400, "Invalid action")
     
-    count = None  # Store count to update fridge
     return {
         "status": "success"
     }
 
-# Get/modify information about a specifc food in the fridge
+# Get/modify information about a specific food in the fridge
 @app.route("/api/fridge/<string:id>/foods/<string:slug>", methods=["GET", "PUT"])
 def get_food(id, slug):
-    recipe = fridges.find_one_or_404({"slug": slug})
-    return food(**recipe).to_json()
+    fridge: Fridge = get_fridge_mongodb(id)
+    foods = fridge.foods
+    filtered_foods = list(filter(lambda x : x.slug == slug, foods))
+    if request.method == "GET":
+        pass
+    elif request.method == "PUT":
+        pass
+    return filtered_foods[0].to_json()
 
 
 # Delete entire fridge
