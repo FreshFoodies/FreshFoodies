@@ -22,14 +22,14 @@ _, img_encoded = cv2.imencode('.jpg', img)
 response = requests.post(test_url, data=base64.b64encode(img_encoded), headers=headers).json()
 # decode response
 
-encoded_img = response['img_color'][1:]
+# encoded_img = response['img_color'][1:]
 
-print(encoded_img[:20])
+# print(encoded_img[:20])
 
-decoded = base64.b64decode(encoded_img)
+# decoded = base64.b64decode(encoded_img)
 
-with open('test.jpg', 'wb') as f_output:
-    f_output.write(decoded)
+# with open('test.jpg', 'wb') as f_output:
+#     f_output.write(decoded)
 
 print(response['text'])
 
