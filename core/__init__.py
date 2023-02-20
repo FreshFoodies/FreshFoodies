@@ -125,10 +125,18 @@ def add_to_fridge(id):
     action = request_json["action"]
     foods_raw = request_json["foods"]
     foods = json.loads(foods_raw)   # Parse food objects
-    filter = {'_id': PydanticObjectId(id)}  # Filter for finding fridge in database
-
+    # filter = {'_id': PydanticObjectId(id)}  # Filter for finding fridge in database
+    food_list = [Food(**food).to_bson() for food in foods]    # Convert JSON foods to food objects for mongodb
     if action == 'add':
-        pass
+        updated_fridge = fridges.find_one_and_update(
+        {"_id": PydanticObjectId(id)},
+        {"$push": {"foods": {"$each": food_list}}},
+        return_document=ReturnDocument.AFTER,
+        )
+        if updated_fridge:  # Successfully added foods
+            return food_list
+        else:
+            flask.abort(404, "Food not found")
     elif action == 'remove':
         pass
     else:
@@ -139,16 +147,30 @@ def add_to_fridge(id):
     }
 
 # Get/modify information about a specific food in the fridge
+"""
+PUT EXPECTS
+Food object
+
+RETURNS
+Food object: 
+{
+    "name": 
+    "category":
+    "location":
+    ...
+}
+"""
 @app.route("/api/fridge/<string:id>/foods/<string:slug>", methods=["GET", "PUT"])
 def get_food(id, slug):
     fridge: Fridge = get_fridge_mongodb(id)
     foods = fridge.foods
     filtered_foods = list(filter(lambda x : x.slug == slug, foods))
     if request.method == "GET":
-        pass
+        return filtered_foods[0].to_json()
     elif request.method == "PUT":
         pass
-    return filtered_foods[0].to_json()
+    else:
+        flask.abort(400, "Invalid request")
 
 
 # Delete entire fridge
