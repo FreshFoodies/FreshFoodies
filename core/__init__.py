@@ -141,10 +141,7 @@ def add_to_fridge(id):
         pass
     else:
         flask.abort(400, "Invalid action")
-    
-    return {
-        "status": "success"
-    }
+
 
 # Get/modify information about a specific food in the fridge
 """
@@ -168,7 +165,7 @@ def get_food(id, slug):
     if request.method == "GET":
         return filtered_foods[0].to_json()
     elif request.method == "PUT":
-        pass
+        pass # Remove and reinsert food
     else:
         flask.abort(400, "Invalid request")
 
@@ -184,21 +181,6 @@ def delete_food(id):
         return Fridge(**deleted_fridge).to_json()
     else:
         flask.abort(404, "Fridge not found")
-
-# TODO: Delete
-@app.route("/api/foods/<string:slug>", methods=["PUT"])
-def update_food(slug):
-    food = food(**request.get_json())
-    food.date_updated = datetime.utcnow()
-    updated_doc = fridges.find_one_and_update(
-        {"slug": slug},
-        {"$set": food.to_bson()},
-        return_document=ReturnDocument.AFTER,
-    )
-    if updated_doc:
-        return food(**updated_doc).to_json()
-    else:
-        flask.abort(404, "Food not found")
 
 # Retrieve fridge object
 def get_fridge_mongodb(id) -> Fridge:
