@@ -16,6 +16,8 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\\Users\\theda\\code\\FreshFoodies\\
 def receipts():
     r = request
 
+    debug = r.headers.get("debug")
+
     print("trying to decode")
     decoded_data = base64.b64decode(r.data)
 
@@ -95,8 +97,10 @@ def receipts():
     print("encoded back into base64")
 
     # build a response dict to send back to client
-    # response = {'status': 200, 'img_color': img_b64_color, 'img_bw': img_b64_bw, 'text': cleaned}
-    response = {'status': 200, 'text': cleaned}
+    if debug and debug.lower() == 'true':
+        response = {'status': 200, 'img_color': img_b64_color, 'img_bw': img_b64_bw, 'text': cleaned}
+    else:
+        response = {'status': 200, 'text': cleaned}
 
     print("done!")
 
