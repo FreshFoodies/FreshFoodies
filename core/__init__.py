@@ -107,6 +107,8 @@ Expects
     "name": ""
     "action": "remove/add"
 }
+
+Returns email of user that was added to fridge
 """
 @app.route("/api/fridge/<string:id>/users", methods=["PUT"])
 def update_fridge_users(id):
@@ -120,12 +122,21 @@ def update_fridge_users(id):
         {"$push": {"users": email}},
         return_document=ReturnDocument.AFTER,
         )
-        if updated_fridge:  # Successfully added foods
+        if updated_fridge:  # Successfully added user
             return email
         else:
             flask.abort(404, "Fridge not found")
     elif action == "remove":
         pass    # Remove email from users array
+        updated_fridge = fridges.find_one_and_update(
+        {"_id": PydanticObjectId(id)},
+        {"$pull": {"users": email}},
+        return_document=ReturnDocument.AFTER,
+        )
+        if updated_fridge:  # Successfully removed user
+            return email
+        else:
+            flask.abort(404, "Fridge not found")
     else:
         flask.abort(400, "Invalid action")
 
