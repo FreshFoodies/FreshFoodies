@@ -79,7 +79,6 @@ RETURNS:
 @app.route("/api/fridge", methods=["POST"])
 def new_fridge():
     raw_fridge = request.get_json()
-    # raw_fridge["date_added"] = datetime.utcnow()
     fridge: Fridge = Fridge(**raw_fridge)
     fridge.foods = []
     fridge.slug = raw_fridge["slug"]
@@ -100,16 +99,37 @@ def get_fridge(id):
     fridge = get_fridge_mongodb(id)
     return fridge.to_json()
 
-# TODO: Update users of fridge
+# Add or remove user of fridge
 """
-
+Expects 
+{
+    "email": ""
+    "name": ""
+    "action": "remove/add"
+}
 """
 @app.route("/api/fridge/<string:id>/users", methods=["PUT"])
 def update_fridge_users(id):
-    pass
+    request_json = request.get_json()
+    email = request_json["email"]
+    # name = request_json["name"]
+    action = request_json["action"]
+    if action == "add":
+        updated_fridge = fridges.find_one_and_update(
+        {"_id": PydanticObjectId(id)},
+        {"$push": {"users": email}},
+        return_document=ReturnDocument.AFTER,
+        )
+        if updated_fridge:  # Successfully added foods
+            return email
+        else:
+            flask.abort(404, "Fridge not found")
+    elif action == "remove":
+        pass    # Remove email from users array
+    else:
+        flask.abort(400, "Invalid action")
 
-
-# TODO: Add or remove list of foods to fridge
+# TODO: Remove list of foods from fridge
 """
 EXPECTS
 {
@@ -117,7 +137,8 @@ EXPECTS
     "action": "add"/"remove"
 }
 
-slug field should be set to the food name with dashes in between
+Slug field should be set to the food name with dashes in between
+If action == "remove",  pass in food names/slugs instead of entire food objects in the request body
 """
 @app.route("/api/fridge/<string:id>/foods", methods=["PUT"])
 def add_to_fridge(id):
@@ -136,9 +157,9 @@ def add_to_fridge(id):
         if updated_fridge:  # Successfully added foods
             return food_list
         else:
-            flask.abort(404, "Food not found")
+            flask.abort(404, "Fridge not found")
     elif action == 'remove':
-        pass
+        pass       # Remove foods that match 
     else:
         flask.abort(400, "Invalid action")
 
@@ -182,7 +203,7 @@ def delete_food(id):
     else:
         flask.abort(404, "Fridge not found")
 
-# Retrieve fridge object
+# Retrieve fridge object reference from given ObjectId
 def get_fridge_mongodb(id) -> Fridge:
     id_object: PydanticObjectId = PydanticObjectId(id)
     raw_fridge = fridges.find_one_or_404(id_object)
