@@ -12,7 +12,7 @@ test_url = addr + '/api/receipt'
 
 # prepare headers for http request
 content_type = 'image/jpeg'
-headers = {'content-type': content_type}
+headers = {'content-type': content_type, 'debug': 'true'}
 
 img = cv2.imread('rc.jpg')
 # encode image as jpeg
@@ -22,14 +22,19 @@ _, img_encoded = cv2.imencode('.jpg', img)
 response = requests.post(test_url, data=base64.b64encode(img_encoded), headers=headers).json()
 # decode response
 
-# encoded_img = response['img_color'][1:]
+encoded_img = response['img_color'][1:]
+encoded_img_bw = response['img_bw'][1:]
 
 # print(encoded_img[:20])
 
-# decoded = base64.b64decode(encoded_img)
+decoded = base64.b64decode(encoded_img)
+decoded_bw = base64.b64decode(encoded_img_bw)
 
-# with open('test.jpg', 'wb') as f_output:
-#     f_output.write(decoded)
+with open('test.jpg', 'wb') as f_output:
+    f_output.write(decoded)
+
+with open('test_bw.jpg', 'wb') as f_output:
+    f_output.write(decoded_bw)
 
 print(response['text'])
 
