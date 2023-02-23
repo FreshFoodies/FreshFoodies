@@ -158,8 +158,8 @@ def add_to_fridge(id):
     foods_raw = request_json["foods"]
     foods = json.loads(foods_raw)   # Parse food objects
     # filter = {'_id': PydanticObjectId(id)}  # Filter for finding fridge in database
-    food_list = [Food(**food).to_bson() for food in foods]    # Convert JSON foods to food objects for mongodb
     if action == 'add':
+        food_list = [Food(**food).to_bson() for food in foods]    # Convert JSON foods to food objects for mongodb
         updated_fridge = fridges.find_one_and_update(
         {"_id": PydanticObjectId(id)},
         {"$push": {"foods": {"$each": food_list}}},
@@ -170,7 +170,16 @@ def add_to_fridge(id):
         else:
             flask.abort(404, "Fridge not found")
     elif action == 'remove':
-        pass       # Remove foods that match 
+        food_list = foods
+        # Remove foods included in request body
+        for slug in food_list:
+            updated_fridge = fridges.find_one_and_update(
+            {"_id": PydanticObjectId(id)},
+            { "$pull": { "foods": { "slug": slug} } },
+            return_document=ReturnDocument.AFTER,
+            )
+        if updated_fridge:  # Successfully removed foods
+            return food_list
     else:
         flask.abort(400, "Invalid action")
 
