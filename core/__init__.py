@@ -28,7 +28,6 @@ app.register_blueprint(receipt_blueprint)
 
 from .models import Fridge, Food
 
-
 """
 Test Account and Fridge
 """
@@ -103,8 +102,8 @@ def get_fridge(id):
 """
 Expects 
 {
-    "email": ""
-    "name": ""
+    "email": "",
+    "name": "",
     "action": "remove/add"
 }
 
@@ -139,12 +138,13 @@ def update_fridge_users(id):
     else:
         flask.abort(400, "Invalid action")
 
-# TODO: Remove list of foods from fridge
 """
 EXPECTS
 {
-    "foods": []
-    "action": "add"/"remove"
+    "foods": [],
+    "action": "add"/"remove",
+    "reason": "eaten"/"wasted",
+    "percentage": "x%"
 }
 
 Slug field should be set to the food name with dashes in between
