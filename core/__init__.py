@@ -127,7 +127,6 @@ def update_fridge_users(id):
         else:
             flask.abort(404, "Fridge not found")
     elif action == "remove":
-        pass    # Remove email from users array
         updated_fridge = fridges.find_one_and_update(
         {"_id": PydanticObjectId(id)},
         {"$pull": {"users": email}},
