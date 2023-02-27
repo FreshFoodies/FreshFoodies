@@ -12,10 +12,15 @@ import json
 import os
 
 import pathlib
+import subprocess
 
-tesseract_path = str(pathlib.Path(__file__).parent.resolve()) + os.path.sep + 'Tesseract-OCR' + os.path.sep + 'tesseract.exe'
-
-pytesseract.pytesseract.tesseract_cmd = tesseract_path
+if os.name == 'nt':
+    tesseract_path = str(pathlib.Path(__file__).parent.resolve()) + os.path.sep + 'Tesseract-OCR-Windows' + os.path.sep + 'tesseract.exe'
+    pytesseract.pytesseract.tesseract_cmd = tesseract_path
+else:
+    bashCommand = "sudo apt-get install tesseract-ocr"
+    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
 
 @receipt.route('/api/receipt', methods=['POST'])
 def receipts():
