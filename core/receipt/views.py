@@ -9,8 +9,13 @@ import re
 import base64
 import matplotlib.pyplot as plt
 import json
+import os
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\\Users\\theda\\code\\FreshFoodies\\core\\receipt\\Tesseract-OCR\\tesseract.exe'
+import pathlib
+
+tesseract_path = str(pathlib.Path(__file__).parent.resolve()) + os.path.sep + 'Tesseract-OCR' + os.path.sep + 'tesseract.exe'
+
+pytesseract.pytesseract.tesseract_cmd = tesseract_path
 
 @receipt.route('/api/receipt', methods=['POST'])
 def receipts():
