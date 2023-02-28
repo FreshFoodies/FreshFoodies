@@ -9,6 +9,7 @@ import flask
 from flask import Flask, request, url_for, jsonify, render_template
 from flask_login import LoginManager
 from flask_pymongo import PyMongo
+
 from pymongo.errors import DuplicateKeyError
 
 from .objectid import PydanticObjectId
