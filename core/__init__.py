@@ -206,7 +206,9 @@ def get_food(id, slug):
     if request.method == "GET":
         return filtered_foods[0].to_json()
     elif request.method == "PUT":
-        pass # Remove and reinsert food
+        # Remove and reinsert food
+        print("replacing food")
+        
     else:
         flask.abort(400, "Invalid request")
 
