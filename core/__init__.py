@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask, session, redirect
 from config import Configuration
 from datetime import datetime
 import os
+import bcrypt
 import json
 from pymongo.collection import Collection, ReturnDocument
 
@@ -17,6 +18,7 @@ from .objectid import PydanticObjectId
 # Set up flask app
 app = Flask(__name__)
 app.config.from_object(Configuration)
+app.secret_key = os.random(24)  # Secret key for client authentication
 app.url_map.strict_slashes = False
 pymongo = PyMongo(app)
 
@@ -27,7 +29,7 @@ app.register_blueprint(food_blueprint)
 from .receipt import receipt as receipt_blueprint
 app.register_blueprint(receipt_blueprint)
 
-from .models import Fridge, Food
+from .models import Fridge, Food, User
 
 """
 Test Account and Fridge
@@ -57,7 +59,50 @@ def resource_not_found(e):
 @app.route("/")
 def index():
     greeting="Welcome to the LookingGlass API!"
-    return render_template('index.html', greet=greeting)
+    return render_template('index.html', message=greeting)
+
+"""
+Create new user
+
+{
+    "name": "",
+    "email": "",
+    "password": ""
+}
+
+"""
+@app.route("/api/new_user")
+def signup():
+    message = ''
+    if "email" in session:
+        return redirect(url_for("/api/logged_in"))
+    if request.method == "POST":
+        request_json = request.get_json()
+
+        user = request_json["name"]
+        email = request_json["email"]
+        
+        password = request_json["password"]
+        
+        user_found = users.find_one({"name": user})
+        email_found = users.find_one({"email": email})
+        if user_found:
+            message = 'There already is a user by that name'
+            return render_template('index.html', message=message)
+        if email_found:
+            message = 'This email already exists in database'
+            return render_template('index.html', message=message)
+        else:
+            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            user_input = {'name': user, 'email': email, 'password': hashed}
+            user: User = User(**user_input)
+            users.insert_one(user.to_bson())
+            
+            user_data = users.find_one({"email": email})
+            new_email = user_data['email']
+   
+            return render_template('logged_in.html', email=new_email)
+    return render_template('index.html')
 
 # Create new empty fridge
 """
@@ -157,7 +202,6 @@ def add_to_fridge(id):
     action = request_json["action"]
     foods_raw = request_json["foods"]
     foods = json.loads(foods_raw)   # Parse food objects
-    # filter = {'_id': PydanticObjectId(id)}  # Filter for finding fridge in database
     if action == 'add':
         food_list = [Food(**food).to_bson() for food in foods]    # Convert JSON foods to food objects for mongodb
         updated_fridge = fridges.find_one_and_update(

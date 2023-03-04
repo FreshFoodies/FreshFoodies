@@ -16,6 +16,7 @@ class User(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
     name: str
     email: str
+    password: str
     fridge_id: PydanticObjectId
     foods: Optional[List[Food]]
 
