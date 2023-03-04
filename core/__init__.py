@@ -18,7 +18,7 @@ from .objectid import PydanticObjectId
 # Set up flask app
 app = Flask(__name__)
 app.config.from_object(Configuration)
-app.secret_key = os.random(24)  # Secret key for client authentication
+app.secret_key = os.urandom(24)  # Secret key for client authentication
 app.url_map.strict_slashes = False
 pymongo = PyMongo(app)
 
