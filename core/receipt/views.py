@@ -40,7 +40,7 @@ def receipts():
         print("img is none")
 
     # resize b/w image
-    img = cv2.resize(img, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
 
     print("resized")
 
