@@ -22,7 +22,7 @@ if os.name == 'nt':
 def receipts():
     r = request
 
-    debug = bool(debug.lower()) if not r.headers.get("debug") else False
+    debug = bool(r.headers.get("debug")) if r.headers.get("debug") else False
 
     print("trying to decode")
     decoded_data = base64.b64decode(r.data)
