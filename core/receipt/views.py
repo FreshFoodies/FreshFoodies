@@ -22,7 +22,7 @@ if os.name == 'nt':
 def receipts():
     r = request
 
-    debug = r.headers.get("debug")
+    debug = bool(debug.lower()) if not r.headers.get("debug") else False
 
     print("trying to decode")
     decoded_data = base64.b64decode(r.data)
@@ -64,7 +64,7 @@ def receipts():
 
     cleaned = []
 
-    if debug and debug.lower() == 'true':
+    if debug:
         # extract bounding boxes from b/w image
         boxes = pytesseract.image_to_boxes(img_bw)
         print("extracted bounding boxes")
@@ -81,12 +81,10 @@ def receipts():
         _, encoded_color = cv2.imencode('.jpg', img_color)
         img_bytes_color = encoded_color.tobytes()
         img_b64_color = str(base64.b64encode(img_bytes_color))[1:]
-
-    _, encoded_bw = cv2.imencode('.jpg', img_bw)
-    img_bytes_bw = encoded_bw.tobytes()
-    img_b64_bw = str(base64.b64encode(img_bytes_bw))[1:]
-
-    print("encoded back into base64")
+        _, encoded_bw = cv2.imencode('.jpg', img_bw)
+        img_bytes_bw = encoded_bw.tobytes()
+        img_b64_bw = str(base64.b64encode(img_bytes_bw))[1:]
+        print("encoded back into base64")
 
     # clean the detected text
     for i in range(len(split)):
@@ -94,7 +92,7 @@ def receipts():
             cleaned.append(split[i])
 
     # build a response dict to send back to client
-    if debug and debug.lower() == 'true':
+    if debug:
         response = {'status': 200, 'img_color': img_b64_color, 'img_bw': img_b64_bw, 'text': cleaned}
     else:
         response = {'status': 200, 'text': cleaned}
