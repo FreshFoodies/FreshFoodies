@@ -71,11 +71,11 @@ Create new user
 }
 
 """
-@app.route("/api/signup")
+@app.route("/api/signup", methods=["POST"])
 def signup():
     message = ''
-    if "email" in session:
-        return redirect(url_for("/api/logged_in"))
+    # if "email" in session:
+    #     return redirect(url_for("/api/logged_in"))
     if request.method == "POST":
         request_json = request.get_json()
 
@@ -97,7 +97,7 @@ def signup():
             user: User = User(**user_input)
             users.insert_one(user.to_bson())
             
-            user_data: User = users.find_one({"email": email})
+            user_data: User = get_user_mongodb(email)
             return user_data.to_json()
     return render_template('index.html')
 
@@ -149,7 +149,7 @@ def new_fridge():
     fridge.id = PydanticObjectId(str(insert_result.inserted_id))
 
     # TODO: Add fridge ID to user's fridge_ids
-    
+
     return fridge.to_json()
 
 # Retrieve fridge from given ID
