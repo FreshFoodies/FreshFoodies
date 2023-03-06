@@ -17,7 +17,7 @@ class User(BaseModel):
     name: str
     email: str
     password: str
-    fridge_id: PydanticObjectId
+    fridge_ids: Optional[List[PydanticObjectId]]
     foods: Optional[List[Food]]
 
     def to_json(self):
@@ -33,7 +33,7 @@ class User(BaseModel):
 class Fridge(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
     slug: str
-    users: Optional[List[str]]    # TODO: CHANGE TO LIST OF USERS INSTEAD OF STRS
+    users: Optional[List[str]]
     foods: Optional[List[Food]]
 
     def to_json(self):

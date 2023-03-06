@@ -18,7 +18,7 @@ from .objectid import PydanticObjectId
 # Set up flask app
 app = Flask(__name__)
 app.config.from_object(Configuration)
-app.secret_key = os.random(24)  # Secret key for client authentication
+app.secret_key = os.urandom(24)  # Secret key for client authentication
 app.url_map.strict_slashes = False
 pymongo = PyMongo(app)
 
@@ -71,7 +71,7 @@ Create new user
 }
 
 """
-@app.route("/api/new_user")
+@app.route("/api/signup")
 def signup():
     message = ''
     if "email" in session:
@@ -81,7 +81,6 @@ def signup():
 
         user = request_json["name"]
         email = request_json["email"]
-        
         password = request_json["password"]
         
         user_found = users.find_one({"name": user})
@@ -94,15 +93,33 @@ def signup():
             return render_template('index.html', message=message)
         else:
             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            user_input = {'name': user, 'email': email, 'password': hashed}
+            user_input = {'name': user, 'email': email, 'password': hashed, 'foods': [], 'fridge_ids': []}
             user: User = User(**user_input)
             users.insert_one(user.to_bson())
             
-            user_data = users.find_one({"email": email})
-            new_email = user_data['email']
-   
-            return render_template('logged_in.html', email=new_email)
+            user_data: User = users.find_one({"email": email})
+            return user_data.to_json()
     return render_template('index.html')
+
+
+"""
+GET
+EXPECTS:
+{
+    "email":
+    "password":
+}
+"""
+@app.route("/api/login", methods=["POST"])
+def login():
+    request_json = request.get_json()
+    email = request_json["email"]
+    # password = request_json["password"]
+    user: User = get_user_mongodb(email)
+    if user:
+        return user.to_json()
+    else:
+        flask.abort(404, "User not found")
 
 # Create new empty fridge
 """
@@ -130,6 +147,9 @@ def new_fridge():
     fridge.users = [raw_fridge["email"]]
     insert_result = fridges.insert_one(fridge.to_bson())
     fridge.id = PydanticObjectId(str(insert_result.inserted_id))
+
+    # TODO: Add fridge ID to user's fridge_ids
+    
     return fridge.to_json()
 
 # Retrieve fridge from given ID
@@ -275,3 +295,8 @@ def get_fridge_mongodb(id) -> Fridge:
     raw_fridge = fridges.find_one_or_404(id_object)
     fridge: Fridge = Fridge(**raw_fridge)
     return fridge
+
+def get_user_mongodb(email: str) -> User:
+    raw_user = users.find_one({"email": email})
+    user: User = User(**raw_user)
+    return user
