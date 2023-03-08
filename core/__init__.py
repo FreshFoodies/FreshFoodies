@@ -82,7 +82,7 @@ def signup():
         user = request_json["name"]
         email = request_json["email"]
         password = request_json["password"]
-        
+
         user_found = users.find_one({"name": user})
         email_found = users.find_one({"email": email})
         if user_found:
