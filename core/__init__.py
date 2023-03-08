@@ -300,17 +300,17 @@ def delete_food(id):
     if deleted_fridge:
         # Remove IDs from associated users
         fridge: Fridge = Fridge(**deleted_fridge)
-        users = fridge.users
-        for user in users:
+        emails = fridge.users
+        for email in emails:
             updated_fridge = users.find_one_and_update(
-            {"email": user},
+            {"email": email},
             {"$pull": {"fridge_ids": id_object}},
             return_document=ReturnDocument.AFTER,
             )
             if updated_fridge:  # Successfully removed user
-                print(f"Removed fridge {id} from {user}'s account")
+                print(f"Removed fridge {id} from {email}'s account")
             else:
-                print(f"No account found for {user}")
+                print(f"No account found for {email}")
         return Fridge(**deleted_fridge).to_json()
     else:
         flask.abort(404, "Fridge not found")
