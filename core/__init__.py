@@ -280,7 +280,7 @@ def get_food(id, slug):
     if request.method == "GET":
         return filtered_foods[0].to_json()
     elif request.method == "PUT":
-        # Remove and reinsert food
+        # TODO: Remove and reinsert food
         print("replacing food")
         
     else:
@@ -295,15 +295,27 @@ def delete_food(id):
         {"_id": id_object},
     )
 
+    # TODO: allow deletion if user is the creater/user in the fridge
+
     if deleted_fridge:
-        # TODO: Remove IDs from associated users
+        # Remove IDs from associated users
         fridge: Fridge = Fridge(**deleted_fridge)
         users = fridge.users
         for user in users:
-            print(user)
+            updated_fridge = users.find_one_and_update(
+            {"email": user},
+            {"$pull": {"fridge_ids": id_object}},
+            return_document=ReturnDocument.AFTER,
+            )
+            if updated_fridge:  # Successfully removed user
+                print(f"Removed fridge {id} from {user}'s account")
+            else:
+                print(f"No account found for {user}")
         return Fridge(**deleted_fridge).to_json()
     else:
         flask.abort(404, "Fridge not found")
+
+
 
 # Retrieve fridge object reference from given ObjectId
 def get_fridge_mongodb(id) -> Fridge:
