@@ -143,12 +143,22 @@ def new_fridge():
     raw_fridge = request.get_json()
     fridge: Fridge = Fridge(**raw_fridge)
     fridge.foods = []
+    email = raw_fridge["email"]
     fridge.slug = raw_fridge["slug"]
-    fridge.users = [raw_fridge["email"]]
+    fridge.users = [email]
     insert_result = fridges.insert_one(fridge.to_bson())
     fridge.id = PydanticObjectId(str(insert_result.inserted_id))
 
-    # TODO: Add fridge ID to user's fridge_ids
+    # Add fridge ID to user's fridge_ids
+    updated_user = users.find_one_and_update(
+    {"email": email},
+    {"$push": {"fridge_ids": fridge.id}},
+    return_document=ReturnDocument.AFTER,
+    )
+    if updated_user:  # Successfully added foods
+        print(f"Added ID to {email}'s account")
+    else:
+        print("User not found!")
 
     return fridge.to_json()
 
@@ -284,7 +294,13 @@ def delete_food(id):
     deleted_fridge = fridges.find_one_and_delete(
         {"_id": id_object},
     )
+
     if deleted_fridge:
+        # TODO: Remove IDs from associated users
+        fridge: Fridge = Fridge(**deleted_fridge)
+        users = fridge.users
+        for user in users:
+            print(user)
         return Fridge(**deleted_fridge).to_json()
     else:
         flask.abort(404, "Fridge not found")
