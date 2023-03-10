@@ -75,7 +75,7 @@ Create new user
 def signup():
     message = ''
     if "email" in session:
-        return redirect(url_for("/api/logged_in"))
+        return redirect(url_for("/api/me"))
     if request.method == "POST":
         request_json = request.get_json()
 
@@ -113,7 +113,7 @@ EXPECTS:
 @app.route("/api/login", methods=["POST"])
 def login():
     if "email" in session:
-        return redirect(url_for("/api/logged_in"))
+        return redirect(url_for("/api/me"))
     request_json = request.get_json()
     email = request_json["email"]
     password = request_json["password"]
@@ -122,21 +122,22 @@ def login():
         actual_password = user.password.encode('utf-8')
         if bcrypt.checkpw(password.encode('utf-8'), actual_password):
             session["email"] = user.email
-            return redirect(url_for('logged_in'))
+            return redirect(url_for('/api/me'))
         else:
             if "email" in session:
-                return redirect(url_for("logged_in"))
+                return redirect(url_for("/api/me"))
             flask.abort(401, "Incorrect password") 
     else:
         flask.abort(404, "User not found")
 
 
 # Route for logged in user
-@app.route('/api/logged_in')
-def logged_in():
+@app.route('/api/me')
+def me():
     if "email" in session:
         email = session["email"]
-        return email
+        user: User = get_user_mongodb(email)
+        return user.to_json()
     else:
         return redirect(url_for("/api/login"))
 
