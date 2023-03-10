@@ -74,8 +74,8 @@ Create new user
 @app.route("/api/signup", methods=["POST"])
 def signup():
     message = ''
-    # if "email" in session:
-    #     return redirect(url_for("/api/logged_in"))
+    if "email" in session:
+        return redirect(url_for("/api/logged_in"))
     if request.method == "POST":
         request_json = request.get_json()
 
@@ -112,14 +112,33 @@ EXPECTS:
 """
 @app.route("/api/login", methods=["POST"])
 def login():
+    if "email" in session:
+        return redirect(url_for("/api/logged_in"))
     request_json = request.get_json()
     email = request_json["email"]
-    # password = request_json["password"]
+    password = request_json["password"]
     user: User = get_user_mongodb(email)
     if user:
-        return user.to_json()
+        actual_password = user.password.encode('utf-8')
+        if bcrypt.checkpw(password.encode('utf-8'), actual_password):
+            session["email"] = user.email
+            return redirect(url_for('logged_in'))
+        else:
+            if "email" in session:
+                return redirect(url_for("logged_in"))
+            flask.abort(401, "Incorrect password") 
     else:
         flask.abort(404, "User not found")
+
+
+# Route for logged in user
+@app.route('/api/logged_in')
+def logged_in():
+    if "email" in session:
+        email = session["email"]
+        return email
+    else:
+        return redirect(url_for("/api/login"))
 
 # Create new empty fridge
 """
@@ -295,7 +314,7 @@ def delete_food(id):
         {"_id": id_object},
     )
 
-    # TODO: allow deletion if user is the creater/user in the fridge
+    # TODO: allow deletion only if user is the creater/user in the fridge
 
     if deleted_fridge:
         # Remove IDs from associated users
