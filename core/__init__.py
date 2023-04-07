@@ -75,7 +75,7 @@ Create new user
 def signup():
     message = ''
     if "email" in session:
-        return redirect(url_for("/api/me"))
+        return json.dumps({"email": session["email"]})
     if request.method == "POST":
         request_json = request.get_json()
 
