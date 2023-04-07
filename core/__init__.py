@@ -113,7 +113,7 @@ EXPECTS:
 @app.route("/api/login", methods=["POST"])
 def login():
     if "email" in session:
-        return redirect(url_for("/api/me"))
+        return session["email"]
     request_json = request.get_json()
     email = request_json["email"]
     password = request_json["password"]
@@ -122,10 +122,10 @@ def login():
         actual_password = user.password.encode('utf-8')
         if bcrypt.checkpw(password.encode('utf-8'), actual_password):
             session["email"] = user.email
-            return redirect(url_for('/api/me'))
+            return user.email
         else:
             if "email" in session:
-                return redirect(url_for("/api/me"))
+                return session["email"]
             flask.abort(401, "Incorrect password") 
     else:
         flask.abort(404, "User not found")
