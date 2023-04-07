@@ -113,7 +113,7 @@ EXPECTS:
 @app.route("/api/login", methods=["POST"])
 def login():
     if "email" in session:
-        return session["email"]
+        return json.loads(session["email"])
     request_json = request.get_json()
     email = request_json["email"]
     password = request_json["password"]
@@ -122,14 +122,13 @@ def login():
         actual_password = user.password.encode('utf-8')
         if bcrypt.checkpw(password.encode('utf-8'), actual_password):
             session["email"] = user.email
-            return user.email
+            return json.loads(user.email)
         else:
             if "email" in session:
-                return session["email"]
+                return json.loads(session["email"])
             flask.abort(401, "Incorrect password") 
     else:
         flask.abort(404, "User not found")
-
 
 # Route for logged in user
 @app.route('/api/me')
@@ -139,7 +138,7 @@ def me():
         user: User = get_user_mongodb(email)
         return user.to_json()
     else:
-        return redirect(url_for("/api/login"))
+        return redirect(url_for("/api/login")) # TODO: CHANGE TO 401
 
 # Create new empty fridge
 """
