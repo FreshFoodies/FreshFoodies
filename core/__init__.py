@@ -67,7 +67,6 @@ Create new user
 {
     "name": "",
     "email": "",
-    "password": ""
 }
 
 """
@@ -81,7 +80,6 @@ def signup():
 
         user = request_json["name"]
         email = request_json["email"]
-        password = request_json["password"]
 
         user_found = users.find_one({"name": user})
         email_found = users.find_one({"email": email})
@@ -92,8 +90,7 @@ def signup():
             message = 'This email already exists in database'
             return render_template('index.html', message=message)
         else:
-            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            user_input = {'name': user, 'email': email, 'password': hashed, 'foods': [], 'fridge_ids': []}
+            user_input = {'name': user, 'email': email, 'foods': [], 'fridge_ids': []}
             user: User = User(**user_input)
             users.insert_one(user.to_bson())
             
@@ -107,7 +104,6 @@ GET
 EXPECTS:
 {
     "email":
-    "password":
 }
 """
 @app.route("/api/login", methods=["POST"])
@@ -116,17 +112,11 @@ def login():
         return json.dumps({"email": session["email"]})
     request_json = request.get_json()
     email = request_json["email"]
-    password = request_json["password"]
     user: User = get_user_mongodb(email)
     if user:
-        actual_password = user.password.encode('utf-8')
-        if bcrypt.checkpw(password.encode('utf-8'), actual_password):
-            session["email"] = user.email
+        session["email"] = user.email
+        if "email" in session:
             return json.dumps({"email": session["email"]})
-        else:
-            if "email" in session:
-                return json.dumps({"email": session["email"]})
-            flask.abort(401, "Incorrect password") 
     else:
         flask.abort(404, "User not found")
 
