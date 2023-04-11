@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect
+# from flask import Flask, session, redirect
 from config import Configuration
 from datetime import datetime
 import os
@@ -73,8 +73,6 @@ Create new user
 @app.route("/api/signup", methods=["POST"])
 def signup():
     message = ''
-    if "email" in session:
-        return json.dumps({"email": session["email"]})
     if request.method == "POST":
         request_json = request.get_json()
 
@@ -108,27 +106,24 @@ EXPECTS:
 """
 @app.route("/api/login", methods=["POST"])
 def login():
-    if "email" in session:
-        return json.dumps({"email": session["email"]})
     request_json = request.get_json()
     email = request_json["email"]
     user: User = get_user_mongodb(email)
     if user:
-        session["email"] = user.email
-        if "email" in session:
-            return json.dumps({"email": session["email"]})
+        return json.dumps({"email": email})
     else:
         flask.abort(404, "User not found")
 
 # Route for logged in user
 @app.route('/api/me')
 def me():
-    if "email" in session:
-        email = session["email"]
-        user: User = get_user_mongodb(email)
+    request_json = request.get_json()
+    email = request_json["email"]
+    user: User = get_user_mongodb(email)
+    if user:
         return user.to_json()
     else:
-        return redirect(url_for("/api/login")) # TODO: CHANGE TO 401
+        flask.abort(404, "User not found")
 
 # Create new empty fridge
 """
