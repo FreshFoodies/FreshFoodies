@@ -88,7 +88,7 @@ def signup():
             message = 'This email already exists in database'
             return render_template('index.html', message=message)
         else:
-            user_input = {'name': user, 'email': email, 'foods': [], 'fridge_ids': [], 'reports': []}
+            user_input = {'name': user, 'email': email, 'foods': [], 'fridge_ids': []}
             user: User = User(**user_input)
             users.insert_one(user.to_bson())
             
