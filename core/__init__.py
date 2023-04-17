@@ -117,7 +117,7 @@ def login():
         flask.abort(404, "User not found")
 
 # Route for logged in user
-@app.route('/api/me')
+@app.route('/api/me', methods=["POST"])
 def me():
     request_json = request.get_json()
     email = request_json["email"]
