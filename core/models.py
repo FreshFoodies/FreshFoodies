@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Union
 from datetime import datetime
 from .food import Food
-from .reports import Report
 
 from .objectid import PydanticObjectId
 
@@ -19,7 +18,6 @@ class User(BaseModel):
     email: str
     fridge_ids: Optional[List[PydanticObjectId]]
     foods: Optional[List[Food]]
-    reports: List[Report]
 
     def to_json(self):
         return jsonable_encoder(self, exclude_none=True)
