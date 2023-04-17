@@ -2,13 +2,12 @@
 from config import Configuration
 from datetime import datetime
 import os
-import bcrypt
+# import bcrypt
 import json
 from pymongo.collection import Collection, ReturnDocument
 
 import flask
 from flask import Flask, request, url_for, jsonify, render_template
-from flask_login import LoginManager
 from flask_pymongo import PyMongo
 
 from pymongo.errors import DuplicateKeyError
@@ -28,6 +27,9 @@ app.register_blueprint(food_blueprint)
 
 from .receipt import receipt as receipt_blueprint
 app.register_blueprint(receipt_blueprint)
+
+from .reports import reports as reports_blueprint
+app.register_blueprint(reports_blueprint)
 
 from .models import Fridge, Food, User
 
@@ -328,6 +330,7 @@ def get_fridge_mongodb(id) -> Fridge:
     fridge: Fridge = Fridge(**raw_fridge)
     return fridge
 
+# Retrieve User
 def get_user_mongodb(email: str) -> User:
     raw_user = users.find_one({"email": email})
     user: User = User(**raw_user)
