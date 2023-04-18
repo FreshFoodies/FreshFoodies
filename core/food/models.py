@@ -16,7 +16,7 @@ class Food(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
     name: str
     slug: str
-    date_added: Optional[datetime]
+    date_added: Optional[datetime]      # NOTE: Change field to mandatory to make reports easier
     expiration_date: Optional[datetime]
     price: Optional[float]
     category: str

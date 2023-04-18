@@ -301,8 +301,6 @@ def delete_food(id):
         {"_id": id_object},
     )
 
-    # TODO: allow deletion only if user is the creater/user in the fridge
-
     if deleted_fridge:
         # Remove IDs from associated users
         fridge: Fridge = Fridge(**deleted_fridge)
