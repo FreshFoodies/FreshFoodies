@@ -17,7 +17,6 @@ class User(BaseModel):
     name: str
     email: str
     fridge_ids: Optional[List[PydanticObjectId]]
-    foods: Optional[List[Food]]
 
     def to_json(self):
         return jsonable_encoder(self, exclude_none=True)
