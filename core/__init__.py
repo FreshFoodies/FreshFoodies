@@ -7,7 +7,7 @@ import json
 from pymongo.collection import Collection, ReturnDocument
 
 import flask
-from flask import Flask, request, url_for, jsonify, render_template
+from flask import Flask, request, jsonify, render_template
 from flask_login import LoginManager
 from flask_pymongo import PyMongo
 
