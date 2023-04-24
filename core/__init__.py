@@ -2,7 +2,6 @@
 from config import Configuration
 from datetime import datetime
 import os
-import bcrypt
 import json
 from pymongo.collection import Collection, ReturnDocument
 
