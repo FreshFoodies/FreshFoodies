@@ -48,7 +48,7 @@ def receipts():
 
     # detect text with pytesseract with b/w image
     # text = pytesseract.image_to_string(img_bw)
-    text = pytesseract.image_to_string(img_bw)
+    text = pytesseract.image_to_string(img_bw, config="--psm 6")
     print("detected text from image")
 
     split = text.splitlines()
