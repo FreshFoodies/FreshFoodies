@@ -31,71 +31,48 @@ def receipts():
 
     nparr = np.frombuffer(decoded_data, np.uint8)
 
-
-    img = cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
-
+    img_bw = cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
     print("decoded into cv2")
 
-    if img is None:
-        print("img is none")
-
     # resize b/w image
-    img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
-
-    print("resized")
+    img_bw = cv2.resize(img_bw, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
 
     # convert to black and white
-    img_bw = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
+    img_bw = cv2.cvtColor(img_bw, cv2.COLOR_BGR2GRAY)
     print("converted to b/w")
 
-    # apply adaptive threshold
-    img_bw = cv2.adaptiveThreshold(img_bw, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                            cv2.THRESH_BINARY_INV, 199, 25)
+    img_bw = cv2.GaussianBlur(img_bw, (11, 11), cv2.BORDER_DEFAULT)
+    print("blurred image")
 
-    print("applied adaptive threshold")
+    # apply adaptive threshold
 
     # detect text with pytesseract with b/w image
-    text = pytesseract.image_to_string(img_bw, config="--psm 6")
-
+    # text = pytesseract.image_to_string(img_bw)
+    text = pytesseract.image_to_string(img_bw)
     print("detected text from image")
 
     split = text.splitlines()
 
     cleaned = []
 
-    if debug:
-        # extract bounding boxes from b/w image
-        boxes = pytesseract.image_to_boxes(img_bw)
-        print("extracted bounding boxes")
-
-        img_color = img
-
-        h, _, _ = img_color.shape
-
-        # add bounding boxes to original color image
-        for b in boxes.splitlines():
-            b = b.split()
-            cv2.rectangle(img_color, ((int(b[1]), h - int(b[2]))), ((int(b[3]), h - int(b[4]))), (0, 255, 0), 3)
-        
-        _, encoded_color = cv2.imencode('.jpg', img_color)
-        img_bytes_color = encoded_color.tobytes()
-        img_b64_color = str(base64.b64encode(img_bytes_color))[1:]
-        _, encoded_bw = cv2.imencode('.jpg', img_bw)
-        img_bytes_bw = encoded_bw.tobytes()
-        img_b64_bw = str(base64.b64encode(img_bytes_bw))[1:]
-        print("encoded back into base64")
-
     # clean the detected text
     for i in range(len(split)):
         if not split[i].isspace() and len(split[i]) > 0 and bool(set('0123456789').intersection(split[i])):
             cleaned.append(split[i])
 
+    print("cleaned text")
+
+    _, encoded_bw = cv2.imencode('.jpg', img_bw)
+    img_bytes_bw = encoded_bw.tobytes()
+    img_b64_bw = str(base64.b64encode(img_bytes_bw))[1:]
+
+    print("encoded back into base64")
+
+    response = {'status': 200, 'text': cleaned}
+
     # build a response dict to send back to client
     if debug:
-        response = {'status': 200, 'img_color': img_b64_color, 'img_bw': img_b64_bw, 'text': cleaned}
-    else:
-        response = {'status': 200, 'text': cleaned}
+        response['img_bw'] = img_b64_bw
 
     print("done!")
 
