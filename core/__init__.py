@@ -7,12 +7,13 @@ from pymongo.collection import Collection, ReturnDocument
 
 import flask
 from flask import Flask, request, jsonify, render_template
-from flask_login import LoginManager
 from flask_pymongo import PyMongo
 
 from pymongo.errors import DuplicateKeyError
 
 from .objectid import PydanticObjectId
+
+# TODO: Add "expires in ... days"
 
 # Set up flask app
 app = Flask(__name__)
@@ -192,7 +193,6 @@ Returns email of user that was added to fridge
 def update_fridge_users(id):
     request_json = request.get_json()
     email = request_json["email"]
-    # name = request_json["name"]
     action = request_json["action"]
     if action == "add":
         updated_fridge = fridges.find_one_and_update(
@@ -222,8 +222,6 @@ EXPECTS
 {
     "foods": [],
     "action": "add"/"remove",
-    "reason": "eaten"/"wasted",
-    "percentage": "x%"
 }
 
 Slug field should be set to the food name with dashes in between
